@@ -19,6 +19,14 @@ rules: {
   'react/jsx-filename-extension': [2, { 'extensions': ['.js', '.jsx', '.ts', '.tsx'] }],
   "react/jsx-indent" : ["error", 4],
   "import/extensions": 'off',
-  "import/no-unresolved": 'off'
+  "import/no-unresolved": 'off',
+  "comma-dangle": 'off',
+  'no-use-before-define': 'off',
+  '@typescript-eslint/no-use-before-define': [ 'error' ],
+  'object-curly-newline': [ 'error', {
+    "ImportDeclaration": { "minProperties": 3, "consistent": false, "multiline": true },
+  } ],
+  "react/jsx-indent-props": ["error", 4],
+  "implicit-arrow-linebreak": 'off'
 }
 
