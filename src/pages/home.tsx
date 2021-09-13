@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Styled from 'styled-components'
-import { TextField, Button } from 'react95'
+import { TextField, Button, AppBar, Toolbar } from 'react95'
 
 const Wrapper = Styled.div`
     width: 100%;
@@ -16,6 +16,13 @@ const Home = () => {
     const [text, setText] = useState<String>('')
     return (
         <Wrapper>
+            <AppBar>
+                <Toolbar>
+                    <Button variant="menu" disabled>
+                        Save
+                    </Button>
+                </Toolbar>
+            </AppBar>
             <WrapperInput>
                 <TextField
                     name="email"
