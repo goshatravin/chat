@@ -23,10 +23,11 @@ rules: {
   "comma-dangle": 'off',
   'no-use-before-define': 'off',
   '@typescript-eslint/no-use-before-define': [ 'error' ],
-  'object-curly-newline': [ 'error', {
-    "ImportDeclaration": { "minProperties": 3, "consistent": false, "multiline": true },
-  } ],
+#  'object-curly-newline': [ 'error', {
+#    "ImportDeclaration": { "minProperties": 3, "consistent": false, "multiline": true },
+#  } ],
   "react/jsx-indent-props": ["error", 4],
-  "implicit-arrow-linebreak": 'off'
+  "implicit-arrow-linebreak": 'off',
+  "object-curly-newline": 'off'
 }
 

@@ -6,6 +6,7 @@ import ms_sans_serif from 'react95/dist/fonts/ms_sans_serif.woff2'
 import ms_sans_serif_bold from 'react95/dist/fonts/ms_sans_serif_bold.woff2'
 import { styleReset } from 'react95'
 import Login from './pages/login'
+import Home from './pages/home'
 
 const GlobalStyles = createGlobalStyle`
   @font-face {
@@ -31,12 +32,26 @@ const GlobalStyles = createGlobalStyle`
   ${styleReset}
 `
 
+// Get the viewport height and multiply it by 1% to get a value for a vh unit
+
+let vh = window.innerHeight * 0.01
+// Then set the custom --vh value to the root of the document
+document.documentElement.style.setProperty('--vh', `${vh}px`)
+
+// We listen to the resize event
+window.addEventListener('resize', () => {
+    // Update the element's size
+    vh = window.innerHeight * 0.01
+    document.documentElement.style.setProperty('--vh', `${vh}px`)
+})
+
 const App = () => (
     <div>
         <GlobalStyles />
         <ThemeProvider theme={original}>
             <Switch>
                 <Route exact path="/login" component={Login} />
+                <Route exact path="/" component={Home} />
             </Switch>
         </ThemeProvider>
     </div>
