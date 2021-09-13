@@ -20,6 +20,11 @@ const GlobalStyles = createGlobalStyle`
     font-weight: bold;
     font-style: normal
   }
+  *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
   body {
     font-family: 'ms_sans_serif',system-ui;
   }
