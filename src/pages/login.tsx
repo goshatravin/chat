@@ -1,6 +1,15 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import Styled from 'styled-components'
-import { TextField, Button, Window, WindowHeader, WindowContent } from 'react95'
+import {
+    TextField,
+    Button,
+    Window,
+    WindowHeader,
+    WindowContent,
+    Hourglass,
+} from 'react95'
+import userValidation from '../validation/index'
 
 export const Wrapper = Styled.div`
     width: 100%;
@@ -30,6 +39,15 @@ export const Spacer = Styled.div`
     height: ${(props: ISpacer) => (props.y ? props.y : 0)}px;
     width: ${(props: ISpacer) => (props.x ? props.x : 0)}px;
 `
+const ErrorText = Styled.p`
+    color: #aa0000;
+`
+const ErrorWrapper = Styled.div`
+    display: flex;
+    align-items: center;
+    img{
+        max-width: 25px;
+    }`
 
 type IUser = {
     email: string
@@ -41,18 +59,27 @@ type ISpacer = {
 }
 
 const Login = () => {
+    const history = useHistory()
     const [button, setButton] = useState<boolean>(false)
     const [user, setUser] = useState<IUser>({
         email: '',
         password: '',
     })
+    const [error, setError] = useState<string>('')
     const auth = () => {
-        setButton(true)
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(setButton(false))
-            }, 3000)
-        })
+        userValidation
+            .validate(user)
+            .then(() => {
+                setError('')
+                setButton(true)
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(setButton(false))
+                        history.push('/')
+                    }, 3000)
+                })
+            })
+            .catch((err) => setError(err.message))
     }
     return (
         <Wrapper>
@@ -61,6 +88,18 @@ const Login = () => {
                     <span>web-chat.exe</span>
                 </WindowHeader>
                 <WindowContent>
+                    <Spacer y={10} />
+                    {error && (
+                        <ErrorWrapper>
+                            <img
+                                src="https://win98icons.alexmeub.com/icons/png/msg_error-0.png"
+                                alt=""
+                            />
+                            <Spacer x={10} />
+                            <ErrorText>{error}</ErrorText>
+                        </ErrorWrapper>
+                    )}
+                    <Spacer y={20} />
                     <InputWrapper>
                         <TextField
                             name="email"
@@ -94,7 +133,7 @@ const Login = () => {
                         />
                         <Spacer y={20} />
                         <Button disabled={button} fullWidth dis onClick={auth}>
-                            Login
+                            {button ? <Hourglass size={20} /> : 'Login'}
                         </Button>
                     </InputWrapper>
                 </WindowContent>

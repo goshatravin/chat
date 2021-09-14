@@ -28,6 +28,7 @@ rules: {
 #  } ],
   "react/jsx-indent-props": ["error", 4],
   "implicit-arrow-linebreak": 'off',
-  "object-curly-newline": 'off'
+  "object-curly-newline": 'off',
+  "no-confusing-arrow": 'off'
 }
 
