@@ -1,37 +1,36 @@
+import { Anchor, Button, Hourglass, TextField, Window, WindowContent, WindowHeader } from 'react95'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { TextField, Anchor, Button, Window, WindowHeader, WindowContent, Hourglass } from 'react95'
 import axios from 'axios'
-import { userValidation } from '../validation/index'
-import { ErrorText, ErrorWrapper, InputWrapper, Spacer, Wrapper } from './style'
+import { Wrapper, Spacer, ErrorWrapper, ErrorText, InputWrapper } from './style'
+import { userRegValidation } from '../validation'
 import { IUser } from '../types'
 
-const Login = () => {
+const Registration = () => {
     const history = useHistory()
     const [button, setButton] = useState<boolean>(false)
-    const [user, setUser] = useState<IUser>({
-        email: 'goshatravin@gmail.com',
-        password: 'P@ssw0rd!',
-    })
-
     const [error, setError] = useState<string>('')
-    const auth = () =>
-        userValidation
-            .validate(user)
+    const [userReg, setUserReg] = useState<IUser>({
+        name: '',
+        email: '',
+        password: '',
+    })
+    const reg = () =>
+        userRegValidation
+            .validate(userReg)
             .then(() => {
                 setError('')
                 setButton(true)
                 axios
-                    .post('/login', user)
+                    .post('/registration', userReg)
                     .then(() => {
-                        setButton(false)
                         history.push('/')
                     })
                     .catch((err) => err)
             })
             .catch((err) => setError(err.message))
     const authSwitch = () => {
-        history.push('/registration')
+        history.push('/login')
     }
     return (
         <Wrapper>
@@ -51,11 +50,25 @@ const Login = () => {
                     <Spacer y={20} />
                     <InputWrapper>
                         <TextField
+                            name="name"
+                            value={userReg.name}
+                            placeholder="Name"
+                            onChange={(e: { target: { name: any; value: any } }) => {
+                                setUserReg((prevState) => ({
+                                    ...prevState,
+                                    [e.target.name]: e.target.value,
+                                }))
+                            }}
+                            fullWidth
+                            height={500}
+                        />
+                        <Spacer y={15} />
+                        <TextField
                             name="email"
-                            value={user.email}
+                            value={userReg.email}
                             placeholder="Email"
                             onChange={(e: { target: { name: any; value: any } }) => {
-                                setUser((prevState) => ({
+                                setUserReg((prevState) => ({
                                     ...prevState,
                                     [e.target.name]: e.target.value,
                                 }))
@@ -66,10 +79,10 @@ const Login = () => {
                         <Spacer y={15} />
                         <TextField
                             name="password"
-                            value={user.password}
+                            value={userReg.password}
                             placeholder="Password"
                             onChange={(e: { target: { name: any; value: any } }) => {
-                                setUser((prevState) => ({
+                                setUserReg((prevState) => ({
                                     ...prevState,
                                     [e.target.name]: e.target.value,
                                 }))
@@ -77,15 +90,16 @@ const Login = () => {
                             fullWidth
                         />
                         <Spacer y={20} />
-                        <Button disabled={button} fullWidth dis onClick={auth}>
-                            {button ? <Hourglass size={20} /> : 'Login'}
+                        <Button disabled={button} fullWidth dis onClick={reg}>
+                            {button ? <Hourglass size={20} /> : 'Registration'}
                         </Button>
                         <Spacer y={10} />
-                        <Anchor onClick={authSwitch}>Dont have an account?</Anchor>
+                        <Anchor onClick={authSwitch}>Has an account ?</Anchor>
                     </InputWrapper>
                 </WindowContent>
             </Window>
         </Wrapper>
     )
 }
-export default Login
+
+export default Registration

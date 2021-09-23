@@ -1,70 +1,108 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Styled from 'styled-components'
 import { TextField, Button, Hourglass } from 'react95'
+import axios from 'axios'
+import { useHistory } from 'react-router-dom'
+import io, { Socket } from 'socket.io-client'
 import Message from '../components/textMessage'
+import UserBar from '../components/userBar'
+import { IUser, IMessageList } from '../types'
 
+const Content = Styled.div`
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+`
+const WrapperInput = Styled.div`
+    display: flex;
+    align-items: flex-end;
+    `
 const Wrapper = Styled.div`
-    width: 100%;
     background-color: teal;
+    width: 100%;
+    border: 1px solid red;
     height: 100vh; /* This is for browsers that don't support custom properties */
     height: calc(var(--vh, 1vh) * 100);
     display: flex;
     flex-direction: column;
     `
-const WrapperInput = Styled.div`
-    display: flex;
-    align-items: flex-end;
-    padding-top:10px`
-
-const Content = Styled.div`
-     flex: 1;
-     overflow-y: scroll;
-`
 const LoadingWrap = Styled.div`
     padding: 0 9px;
 `
 
-const messages = [
-    {
-        id: 0,
-        message:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        time: '14:24',
-        from: true,
-        name: 'Gosha',
-    },
-]
-
-// @ts-ignore
-const mapper = (item) => <Message key={item.id} data={item} />
-
 const Home = () => {
-    const [text, setText] = useState<String>('')
+    const history = useHistory()
+    const [socket, setSocket] = useState<Socket | null>(null)
+    const [user, setUser] = useState<IUser>({
+        email: '',
+        password: '',
+        name: '',
+    })
+    const [messageList, setMessageList] = useState<IMessageList[]>([])
+    const [userList, setUserList] = useState<IUser[]>([])
+    const [text, setText] = useState<string>('')
     const [isSending, setIsSending] = useState<boolean>(false)
-    const sendMessage = (e: any) => {
-        // eslint-disable-next-line no-new
-        new Promise((resolve) => {
-            setIsSending(true)
-            setText('')
-            setTimeout(() => {
-                resolve(setIsSending(false))
-            }, 3000)
-        })
-        if (e.keyCode === 13) {
-            console.log('123')
+    // eslint-disable-next-line max-len
+    const mapper = (item: IMessageList) => <Message key={item.message_id} data={item} email={user.email} />
+    useEffect(() => {
+        const ioConnection = io(`http://${window.location.hostname}:3000`)
+        setSocket(ioConnection as Socket)
+        axios
+            .get('/userInfo')
+            .then(({ data }) => {
+                setUser(data)
+                ioConnection.emit('new_user', data)
+            })
+            .catch(() => {
+                history.push('/login')
+            })
+        return () => {
+            ioConnection.close()
         }
-    }
+    }, [setSocket])
 
+    useEffect(() => {
+        socket?.on('user_joined', (data: IUser[]) => {
+            setUserList(data)
+        })
+        socket?.on('user_left', (data: IUser[]) => {
+            setUserList(data)
+        })
+        socket?.on('active_users', (data: IUser[]) => {
+            setUserList(data)
+        })
+        socket?.on('message_history', (data: IMessageList[]) => {
+            setMessageList(data)
+        })
+        socket?.on('get_message', (data: IMessageList) => {
+            setMessageList((oldArray: IMessageList[]) => [...oldArray, data])
+        })
+    }, [socket])
+
+    const sendMessage = () => {
+        setIsSending(true)
+        const newMessage = {
+            text,
+            date: new Date().toDateString(),
+            user,
+        }
+        socket?.emit('send_message', newMessage)
+        setIsSending(false)
+        setText('')
+    }
     return (
         <Wrapper>
-            <Content>{messages.map(mapper)}</Content>
+            {userList?.length > 0 && <UserBar data={userList} />}
+            <Content>{messageList?.map(mapper)}</Content>
             <WrapperInput>
                 <TextField
-                    onKeyDown={(e: any) => e.keyCode === 13 && sendMessage(e)}
+                    disabled={isSending}
+                    onKeyDown={(e: KeyboardEvent) => e.keyCode === 13 && sendMessage()}
                     name="email"
                     value={text}
                     placeholder="New message..."
-                    onChange={(e: { target: { name: any; value: any } }) => {
+                    onChange={(e: { target: { name: string; value: string } }) => {
                         setText(e.target.value)
                     }}
                     fullWidth

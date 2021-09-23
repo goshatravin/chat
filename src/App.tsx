@@ -6,7 +6,9 @@ import ms_sans_serif from 'react95/dist/fonts/ms_sans_serif.woff2'
 import ms_sans_serif_bold from 'react95/dist/fonts/ms_sans_serif_bold.woff2'
 import { styleReset } from 'react95'
 import Login from './pages/login'
+import Test from './pages/Test'
 import Home from './pages/home'
+import Registration from './pages/registration'
 
 const GlobalStyles = createGlobalStyle`
   @font-face {
@@ -51,7 +53,9 @@ const App = () => (
         <ThemeProvider theme={original}>
             <Switch>
                 <Route exact path="/login" component={Login} />
+                <Route exact path="/registration" component={Registration} />
                 <Route exact path="/" component={Home} />
+                <Route exact path="/test" component={Test} />
             </Switch>
         </ThemeProvider>
     </div>
